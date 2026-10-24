@@ -14,6 +14,9 @@ export interface CopilotStatus {
 }
 
 export async function fetchCopilotStatus(timeoutMs = 2500): Promise<CopilotStatus> {
+  // Static deployments (e.g. GitHub Pages) have no API: skip the probe instead
+  // of producing a 404. This is a public build flag, not a secret.
+  if (import.meta.env.VITE_COPILOT_API === 'off') return { available: false, checked: true };
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
